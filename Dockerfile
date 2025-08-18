@@ -9,6 +9,12 @@ RUN corepack enable
 # This stage builds the application
 FROM base AS builder
 WORKDIR /app
+
+ARG VITE_BASE_URL
+ENV VITE_BASE_URL=${VITE_BASE_URL}
+ARG VITE_ATLAS_WEBSOCKET_URL
+ENV VITE_ATLAS_WEBSOCKET_URL=${VITE_ATLAS_WEBSOCKET_URL}
+
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
