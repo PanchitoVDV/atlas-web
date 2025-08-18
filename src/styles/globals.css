@@ -17,10 +17,10 @@ body {
   --card-foreground: hsla(0, 0%, 12%, 1);
   --popover: hsla(0, 0%, 95%, 1);
   --popover-foreground: hsla(0, 0%, 12%, 1);
-  --primary-plain: 30, 56%, 65%;
+  --primary-plain: 99, 21%, 53%;
   --primary: hsla(var(--primary-plain), 1);
   --primary-foreground: hsla(0, 0%, 12%, 1);
-  --secondary: hsla(47, 100%, 67%, 1);
+  --secondary: hsla(127, 100%, 67%, 1.00);
   --secondary-foreground: hsla(0, 0%, 12%, 1);
   --muted: hsla(0, 0%, 90%, 1);
   --muted-foreground: hsla(0, 0%, 40%, 1);
@@ -65,10 +65,10 @@ body {
   --card-foreground: hsla(0, 0%, 95%, 1);
   --popover: hsla(0, 0%, 13%, 1);
   --popover-foreground: hsla(0, 0%, 95%, 1);
-  --primary-plain: 30, 56%, 65%;
+  --primary-plain: 99, 21%, 53%;
   --primary: hsla(var(--primary-plain), 1);
   --primary-foreground: hsla(0, 0%, 95%, 1);
-  --secondary: hsla(47, 100%, 53%, 1);
+  --secondary: hsla(127, 100%, 67%, 1.00);
   --secondary-foreground: hsla(0, 0%, 5%, 1);
   --muted: hsla(0, 0%, 23%, 1);
   --muted-foreground: hsla(0, 0%, 70%, 1);
