@@ -44,7 +44,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          env: |
+          build-args: |
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
             VITE_ATLAS_WEBSOCKET_URL=${{ secrets.VITE_ATLAS_WEBSOCKET_URL }}
           cache-from: type=gha,scope=${{ github.workflow }}
