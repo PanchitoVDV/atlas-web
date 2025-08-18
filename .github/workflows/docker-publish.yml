@@ -47,5 +47,4 @@ jobs:
           build-args: |
             VITE_BASE_URL=${{ secrets.VITE_BASE_URL }}
             VITE_ATLAS_WEBSOCKET_URL=${{ secrets.VITE_ATLAS_WEBSOCKET_URL }}
-          cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }},mode=max
+          no-cache: true
