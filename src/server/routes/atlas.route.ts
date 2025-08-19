@@ -1407,6 +1407,7 @@ export default {
   utilization,
   getServerLogs,
   scale,
+  restartGroup,
   startServer,
   stopServer,
   restartServer,

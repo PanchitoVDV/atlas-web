@@ -268,7 +268,7 @@ const RouteComponent = () => {
                       size="sm"
                       onClick={() =>
                         toast.promise(
-                          mutation.mutateAsync({
+                          restartMutation.mutateAsync({
                             group: groupId
                           }),
                           {
