@@ -4,7 +4,6 @@ import {
   MinusIcon,
   OctagonXIcon,
   PlusIcon,
-  RotateCcwIcon,
   ServerIcon,
   UsersIcon,
 } from "lucide-react";
