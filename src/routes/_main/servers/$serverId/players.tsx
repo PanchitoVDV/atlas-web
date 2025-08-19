@@ -43,9 +43,11 @@ const RouteComponent = () => {
                 className="flex items-center gap-3 rounded-lg border p-3"
               >
                 <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full">
-                  <span className="text-xs font-medium">
-                    {player.charAt(0).toUpperCase()}
-                  </span>
+                  <img
+                    src={`https://mc-heads.net/head/${player}/64`} // Requesting a 64px head
+                    alt={`${player}'s Minecraft Head`}
+                    className="h-full w-full"
+                  />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{player}</p>
