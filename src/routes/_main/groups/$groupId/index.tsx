@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   MinusIcon,
   PlusIcon,
+  RotateCcwIcon,
   ServerIcon,
   UsersIcon,
 } from "lucide-react";
@@ -288,6 +289,7 @@ const RouteComponent = () => {
                       }
                       className="w-full"
                     >
+                      <RotateCcwIcon className="mr-1 h-4 w-4" />
                       Restart
                     </Button>
                   </div>
