@@ -283,12 +283,11 @@ const RouteComponent = () => {
                         )
                       }
                       disabled={
-                        group.currentServers <= group.minServers ||
+                        group.currentServers < group.minServers ||
                         mutation.isPending
                       }
                       className="w-full"
                     >
-                      <MinusIcon className="mr-1 h-4 w-4" />
                       Restart
                     </Button>
                   </div>
