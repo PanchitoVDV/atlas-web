@@ -33,8 +33,8 @@ const RouteComponent = () => {
     })
   );
 
-  const restartMutation = useMutation(
-    orpc.atlas.restartGroup.mutationOptions({
+  const stopMutation = useMutation(
+    orpc.atlas.stopGroup.mutationOptions({
       onSuccess: async () => {
         await window.getQueryClient().invalidateQueries();
         await window.getRouter().invalidate();
@@ -269,17 +269,17 @@ const RouteComponent = () => {
                       size="sm"
                       onClick={() =>
                         toast.promise(
-                          restartMutation.mutateAsync({
+                          stopMutation.mutateAsync({
                             group: groupId
                           }),
                           {
-                            loading: "Restarting...",
+                            loading: "Stopping group...",
                             success: {
-                              message: "Restarted!",
+                              message: "Stopped!",
                               description:
                                 "It might take a second for the servers to disappear.",
                             },
-                            error: "Failed to restart",
+                            error: "Failed to stop group",
                           }
                         )
                       }
@@ -289,8 +289,8 @@ const RouteComponent = () => {
                       }
                       className="w-full"
                     >
-                      <RotateCcwIcon className="mr-1 h-4 w-4" />
-                      Restart
+                      <OctagonXIcon className="mr-1 h-4 w-4" />
+                      Stop Group
                     </Button>
                   </div>
                 </div>

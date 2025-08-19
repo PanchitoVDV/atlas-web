@@ -232,9 +232,9 @@ export class AtlasApiClient {
     );
   }
 
-  async restartGroup(group: string): Promise<ApiResponse<ScalingGroup>> {
+  async stopGroup(group: string): Promise<ApiResponse<ScalingGroup>> {
     return this.request(
-      `/api/v1/groups/${group}/restart`,
+      `/api/v1/groups/${group}/stop`,
       {
         method: "POST",
       },
@@ -890,7 +890,7 @@ const atlas = {
   getGroup: (group: string) => getAtlasClient().getGroup(group),
   scaleGroup: (group: string, scaleData: ScaleRequest) =>
     getAtlasClient().scaleGroup(group, scaleData),
-  restartGroup: (group: string) => getAtlasClient().restartGroup(group),
+  stopGroup: (group: string) => getAtlasClient().stopGroup(group),
   getScalingConfig: () => getAtlasClient().getScalingConfig(),
   getMetrics: () => getAtlasClient().getMetrics(),
   getUtilization: () => getAtlasClient().getUtilization(),

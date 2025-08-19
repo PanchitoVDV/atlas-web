@@ -144,7 +144,7 @@ const scale = os
     }
   });
 
-const restartGroup = os
+const stopGroup = os
   .input(z.object({ group: z.string() }))
   .handler(async ({ input }) => {
     const request = getWebRequest();
@@ -157,11 +157,11 @@ const restartGroup = os
     }
 
     try {
-      const group = await atlas.restartGroup(input.group);
+      const group = await atlas.stopGroup(input.group);
 
       // Log successful operation (not restorable)
       await AuditService.logAction({
-        action: "restart",
+        action: "stop",
         resourceType: "group",
         resourceId: input.group,
         details: input,
@@ -173,7 +173,7 @@ const restartGroup = os
     } catch (error) {
       // Log failed operation
       await AuditService.logAction({
-        action: "restart",
+        action: "stop",
         resourceType: "group",
         resourceId: input.group,
         details: input,
@@ -1407,7 +1407,7 @@ export default {
   utilization,
   getServerLogs,
   scale,
-  restartGroup,
+  stopGroup,
   startServer,
   stopServer,
   restartServer,
