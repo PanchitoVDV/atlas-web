@@ -63,7 +63,7 @@ import {
   type ZipFilesRequest,
   ZipFilesRequestSchema,
   type ZipFilesResponse,
-  ZipFilesResponseSchema,
+  ZipFilesResponseSchema
 } from "./atlas-api.schemas";
 
 export class AtlasApiClient {
@@ -227,6 +227,16 @@ export class AtlasApiClient {
       {
         method: "POST",
         body: JSON.stringify(scaleData),
+      },
+      ScalingGroupResponse
+    );
+  }
+
+  async restartGroup(group: string): Promise<ApiResponse<ScalingGroup>> {
+    return this.request(
+      `/api/v1/groups/${group}/restart`,
+      {
+        method: "POST",
       },
       ScalingGroupResponse
     );
@@ -598,52 +608,52 @@ export class AtlasApiClient {
 
   async getRecentActivities(filters?: ActivityFilters): Promise<ActivitiesResponse> {
     let url = "/api/v1/activity/recent";
-    
+
     if (filters) {
       const params = new URLSearchParams();
       if (filters.limit) params.append("limit", filters.limit.toString());
       if (filters.offset) params.append("offset", filters.offset.toString());
-      
+
       const queryString = params.toString();
       if (queryString) {
         url += `?${queryString}`;
       }
     }
-    
+
     return this.request(url, {}, ActivitiesResponseSchema);
   }
 
   async getServerActivities(serverId: string, filters?: ActivityFilters): Promise<ActivitiesResponse> {
     let url = `/api/v1/activity/servers/${serverId}`;
-    
+
     if (filters) {
       const params = new URLSearchParams();
       if (filters.limit) params.append("limit", filters.limit.toString());
       if (filters.offset) params.append("offset", filters.offset.toString());
-      
+
       const queryString = params.toString();
       if (queryString) {
         url += `?${queryString}`;
       }
     }
-    
+
     return this.request(url, {}, ActivitiesResponseSchema);
   }
 
   async getGroupActivities(groupName: string, filters?: ActivityFilters): Promise<ActivitiesResponse> {
     let url = `/api/v1/activity/groups/${groupName}`;
-    
+
     if (filters) {
       const params = new URLSearchParams();
       if (filters.limit) params.append("limit", filters.limit.toString());
       if (filters.offset) params.append("offset", filters.offset.toString());
-      
+
       const queryString = params.toString();
       if (queryString) {
         url += `?${queryString}`;
       }
     }
-    
+
     return this.request(url, {}, ActivitiesResponseSchema);
   }
 
@@ -702,7 +712,7 @@ export class AtlasApiClient {
     return this.request(url, { method: "DELETE" }, FileDeleteResponseSchema);
   }
 
-  async renameTemplateFile(renameData: FileRenameRequest): Promise<ApiResponse<{path: string}>> {
+  async renameTemplateFile(renameData: FileRenameRequest): Promise<ApiResponse<{ path: string }>> {
     const url = "/api/v1/templates/files/rename";
     return this.request(
       url,
@@ -880,6 +890,7 @@ const atlas = {
   getGroup: (group: string) => getAtlasClient().getGroup(group),
   scaleGroup: (group: string, scaleData: ScaleRequest) =>
     getAtlasClient().scaleGroup(group, scaleData),
+  restartGroup: (group: string) => getAtlasClient().restartGroup(group),
   getScalingConfig: () => getAtlasClient().getScalingConfig(),
   getMetrics: () => getAtlasClient().getMetrics(),
   getUtilization: () => getAtlasClient().getUtilization(),

@@ -463,7 +463,7 @@ export type ChunkedUploadCompleteResponse = z.infer<typeof ChunkedUploadComplete
 
 export const ActivityTypeSchema = z.enum([
   "ATLAS_LIFECYCLE",
-  "SCALING_OPERATION", 
+  "SCALING_OPERATION",
   "SERVER_RESTART",
   "PLAYER_SURGE",
   "BACKUP_OPERATION",

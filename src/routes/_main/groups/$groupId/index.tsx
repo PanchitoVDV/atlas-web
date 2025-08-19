@@ -32,6 +32,15 @@ const RouteComponent = () => {
     })
   );
 
+  const restartMutation = useMutation(
+    orpc.atlas.restartGroup.mutationOptions({
+      onSuccess: async () => {
+        await window.getQueryClient().invalidateQueries();
+        await window.getRouter().invalidate();
+      },
+    })
+  );
+
   if (!group) {
     return <div>Loading...</div>;
   }
@@ -253,6 +262,34 @@ const RouteComponent = () => {
                     >
                       <MinusIcon className="mr-1 h-4 w-4" />
                       Scale Down
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        toast.promise(
+                          mutation.mutateAsync({
+                            group: groupId
+                          }),
+                          {
+                            loading: "Restarting...",
+                            success: {
+                              message: "Restarted!",
+                              description:
+                                "It might take a second for the servers to disappear.",
+                            },
+                            error: "Failed to restart",
+                          }
+                        )
+                      }
+                      disabled={
+                        group.currentServers <= group.minServers ||
+                        mutation.isPending
+                      }
+                      className="w-full"
+                    >
+                      <MinusIcon className="mr-1 h-4 w-4" />
+                      Restart
                     </Button>
                   </div>
                 </div>

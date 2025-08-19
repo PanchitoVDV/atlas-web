@@ -1,18 +1,18 @@
 import { ORPCError, os } from "@orpc/server";
 import { getWebRequest } from "@tanstack/react-start/server";
+import { and, count, desc, eq, like, or, sql } from "drizzle-orm";
 import { z } from "zod";
-import { eq, desc, and, like, or, count, sql } from "drizzle-orm";
 
-import { env } from "@/env";
 import { db } from "@/db";
 import { auditLogs, users } from "@/db/schema";
+import { env } from "@/env";
 import atlas from "@/server/lib/atlas-api/atlas-api.client";
-import { auth } from "@/server/lib/auth";
-import { AuditService } from "@/server/lib/audit";
 import {
   UnzipFileRequestSchema,
   ZipFilesRequestSchema,
 } from "@/server/lib/atlas-api/atlas-api.schemas";
+import { AuditService } from "@/server/lib/audit";
+import { auth } from "@/server/lib/auth";
 
 const serverListInputSchema = z.object({
   group: z.string().optional(),
@@ -133,6 +133,47 @@ const scale = os
       // Log failed operation
       await AuditService.logAction({
         action: "scale",
+        resourceType: "group",
+        resourceId: input.group,
+        details: input,
+        restorePossible: false,
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      });
+      throw error;
+    }
+  });
+
+const restartGroup = os
+  .input(z.object({ group: z.string() }))
+  .handler(async ({ input }) => {
+    const request = getWebRequest();
+    const session = await auth.api.getSession({
+      headers: request?.headers ?? new Headers(),
+    });
+
+    if (!session) {
+      throw new ORPCError("UNAUTHORIZED", { message: "Unauthorized" });
+    }
+
+    try {
+      const group = await atlas.restartGroup(input.group);
+
+      // Log successful operation (not restorable)
+      await AuditService.logAction({
+        action: "restart",
+        resourceType: "group",
+        resourceId: input.group,
+        details: input,
+        restorePossible: false,
+        success: true,
+      });
+
+      return group.data;
+    } catch (error) {
+      // Log failed operation
+      await AuditService.logAction({
+        action: "restart",
         resourceType: "group",
         resourceId: input.group,
         details: input,
@@ -756,7 +797,7 @@ const getTemplateFileContents = os
 
     try {
       const fileContents = await atlas.getTemplateFileContents(input.file);
-      
+
       await AuditService.logAction({
         action: "getTemplateFileContents",
         resourceType: "template",
@@ -765,7 +806,7 @@ const getTemplateFileContents = os
         restorePossible: false,
         success: true,
       });
-      
+
       return fileContents;
     } catch (error) {
       await AuditService.logAction({
@@ -800,7 +841,7 @@ const writeTemplateFileContents = os
 
     try {
       const result = await atlas.writeTemplateFileContents(input.file, input.content);
-      
+
       await AuditService.logAction({
         action: "writeTemplateFileContents",
         resourceType: "template",
@@ -809,7 +850,7 @@ const writeTemplateFileContents = os
         backupData,
         success: true,
       });
-      
+
       return result;
     } catch (error) {
       await AuditService.logAction({
@@ -844,7 +885,7 @@ const deleteTemplateFile = os
 
     try {
       const result = await atlas.deleteTemplateFile(input.file);
-      
+
       await AuditService.logAction({
         action: "deleteTemplateFile",
         resourceType: "template",
@@ -853,7 +894,7 @@ const deleteTemplateFile = os
         backupData,
         success: true,
       });
-      
+
       return result;
     } catch (error) {
       await AuditService.logAction({
@@ -883,7 +924,7 @@ const renameTemplateFile = os
 
     try {
       const result = await atlas.renameTemplateFile(input);
-      
+
       await AuditService.logAction({
         action: "renameTemplateFile",
         resourceType: "template",
@@ -892,7 +933,7 @@ const renameTemplateFile = os
         backupData: { originalPath: input.oldPath },
         success: true,
       });
-      
+
       return result;
     } catch (error) {
       await AuditService.logAction({
@@ -922,7 +963,7 @@ const createTemplateFolder = os
 
     try {
       const result = await atlas.createTemplateFolder(input.path);
-      
+
       await AuditService.logAction({
         action: "createTemplateFolder",
         resourceType: "template",
@@ -930,7 +971,7 @@ const createTemplateFolder = os
         details: input,
         success: true,
       });
-      
+
       return result;
     } catch (error) {
       await AuditService.logAction({
@@ -996,7 +1037,7 @@ const unzipTemplateFile = os
 
 // Audit and Restore Endpoints
 const getAuditHistory = os
-  .input(z.object({ 
+  .input(z.object({
     resourceType: z.enum(["server", "group", "template", "file"]),
     resourceId: z.string(),
     limit: z.number().min(1).max(100).default(50),
@@ -1032,7 +1073,7 @@ const getAuditHistory = os
   });
 
 const getRestorableActions = os
-  .input(z.object({ 
+  .input(z.object({
     resourceType: z.enum(["server", "group", "template", "file"]),
     resourceId: z.string(),
     limit: z.number().min(1).max(50).default(20),
@@ -1077,7 +1118,7 @@ const restoreAction = os
     }
 
     const result = await AuditService.restoreAction(input.auditLogId);
-    
+
     if (!result.success) {
       throw new ORPCError("BAD_REQUEST", { message: result.message });
     }
@@ -1086,7 +1127,7 @@ const restoreAction = os
   });
 
 const getServerAuditHistory = os
-  .input(z.object({ 
+  .input(z.object({
     serverId: z.string().optional(),
     serverName: z.string().optional(),
     limit: z.number().min(1).max(100).default(50),
@@ -1106,7 +1147,7 @@ const getServerAuditHistory = os
 
     // Build where conditions based on input
     const whereConditions: any[] = [];
-    
+
     if (input.serverId && input.serverName) {
       // Both ID and name provided - search for either
       whereConditions.push(
@@ -1120,10 +1161,10 @@ const getServerAuditHistory = os
     } else if (input.serverName) {
       whereConditions.push(eq(auditLogs.resourceId, input.serverName));
     }
-    
+
     // Add resource type filter (only server actions)
     whereConditions.push(eq(auditLogs.resourceType, "server"));
-    
+
     // Add search filter if provided
     if (input.search) {
       whereConditions.push(
@@ -1133,12 +1174,12 @@ const getServerAuditHistory = os
         )
       );
     }
-    
+
     // Add action type filter if provided
     if (input.actionType) {
       whereConditions.push(like(auditLogs.action, `%${input.actionType}%`));
     }
-    
+
     const [logs, totalResult] = await Promise.all([
       db.select({
         id: auditLogs.id,
@@ -1157,13 +1198,13 @@ const getServerAuditHistory = os
         userName: users.name,
         userEmail: users.email,
       })
-      .from(auditLogs)
-      .leftJoin(users, eq(auditLogs.userId, users.id))
-      .where(and(...whereConditions))
-      .orderBy(desc(auditLogs.timestamp))
-      .limit(input.limit)
-      .offset(input.offset),
-      
+        .from(auditLogs)
+        .leftJoin(users, eq(auditLogs.userId, users.id))
+        .where(and(...whereConditions))
+        .orderBy(desc(auditLogs.timestamp))
+        .limit(input.limit)
+        .offset(input.offset),
+
       db.select({ count: sql<number>`count(*)` })
         .from(auditLogs)
         .where(and(...whereConditions))
@@ -1180,7 +1221,7 @@ const getServerAuditHistory = os
   });
 
 const getGroupAuditHistory = os
-  .input(z.object({ 
+  .input(z.object({
     groupId: z.string(),
     limit: z.number().min(1).max(100).default(50),
     offset: z.number().min(0).default(0),
@@ -1201,7 +1242,7 @@ const getGroupAuditHistory = os
       eq(auditLogs.resourceType, "group"),
       eq(auditLogs.resourceId, input.groupId)
     ];
-    
+
     if (input.search) {
       whereConditions.push(
         or(
@@ -1210,11 +1251,11 @@ const getGroupAuditHistory = os
         )
       );
     }
-    
+
     if (input.actionType) {
       whereConditions.push(like(auditLogs.action, `%${input.actionType}%`));
     }
-    
+
     const [logs, totalResult] = await Promise.all([
       db.select({
         id: auditLogs.id,
@@ -1233,13 +1274,13 @@ const getGroupAuditHistory = os
         userName: users.name,
         userEmail: users.email,
       })
-      .from(auditLogs)
-      .leftJoin(users, eq(auditLogs.userId, users.id))
-      .where(and(...whereConditions))
-      .orderBy(desc(auditLogs.timestamp))
-      .limit(input.limit)
-      .offset(input.offset),
-      
+        .from(auditLogs)
+        .leftJoin(users, eq(auditLogs.userId, users.id))
+        .where(and(...whereConditions))
+        .orderBy(desc(auditLogs.timestamp))
+        .limit(input.limit)
+        .offset(input.offset),
+
       db.select({ count: sql<number>`count(*)` })
         .from(auditLogs)
         .where(and(...whereConditions))
@@ -1256,7 +1297,7 @@ const getGroupAuditHistory = os
   });
 
 const getAllAuditLogs = os
-  .input(z.object({ 
+  .input(z.object({
     limit: z.number().min(1).max(200).default(50),
     offset: z.number().min(0).default(0),
     resourceType: z.enum(["server", "group", "template", "file"]).optional(),
@@ -1275,7 +1316,7 @@ const getAllAuditLogs = os
 
     // Build query conditions
     const whereConditions: any[] = [];
-    
+
     if (input.resourceType) {
       whereConditions.push(eq(auditLogs.resourceType, input.resourceType));
     }
@@ -1299,7 +1340,7 @@ const getAllAuditLogs = os
         update: ["write%", "rename%", "move%", "restart%", "scale%"],
         delete: ["delete%", "stop%"],
       };
-      
+
       const patterns = actionPatterns[input.actionType] || [];
       if (patterns.length > 0) {
         whereConditions.push(
