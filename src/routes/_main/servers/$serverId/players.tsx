@@ -23,7 +23,7 @@ const RouteComponent = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-btetween">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-2">
             <UsersIcon className="h-5 w-5" />
             Online Players
           </div>
