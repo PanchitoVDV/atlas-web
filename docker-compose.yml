@@ -36,7 +36,7 @@ services:
       start_period: 10s
 
   atlas-web:
-    image: ghcr.io/mineplaymc/atlas-web:latest
+    image: ghcr.io/panchitovdv/atlas-web:latest
     restart: always
     ports:
       - "3000:3000"
