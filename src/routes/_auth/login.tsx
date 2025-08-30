@@ -29,7 +29,7 @@ const RouteComponent = () => {
         <img src="/logo.png" alt="Atlas" className="mx-auto mb-6 h-20 w-20" />
         <h1 className="mb-4 text-3xl font-bold">Welcome to Atlas</h1>
         <p className="text-muted-foreground">
-          Sign in with your Mineplay Identity account to get started
+          Sign in with your Panchito Ritalin Productions Identity account to get started
         </p>
       </div>
 
@@ -43,7 +43,7 @@ const RouteComponent = () => {
             <span className="text-sm">
               {isIdentityLoading
                 ? "Signing in..."
-                : "Sign in with Mineplay Identity"}
+                : "Sign in with Panchito Identity"}
             </span>
           </button>
         </div>
